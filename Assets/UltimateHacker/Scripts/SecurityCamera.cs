@@ -22,12 +22,25 @@ namespace UltimateHacker
 
         public GameObject Indicator;
 
+        public float CameraDistance = 10f;
+        public bool DebugEnabled = false;
+
         private GameController _gameController;
         private Coroutine _routine;
         private Camera _camera;
         private SecurityCameraState _state = SecurityCameraState.Online;
         private float _recording = 0f;
         private float _pollTime = 0.5f;
+
+        private float PollTime
+        {
+            get { return this._pollTime; }
+            set
+            {
+                this._pollTime = value;
+                this.UpdateCoroutine();
+            }
+        }
 
         public SecurityCameraState State
         {
@@ -63,21 +76,64 @@ namespace UltimateHacker
                 this._routine = null;
             }
 
-            this.StartCoroutine(this.Scan());
+            this._routine = this.StartCoroutine(this.Scan());
         }
 
         private IEnumerator Scan()
         {
             while (true)
             {
-                yield return new WaitForSecondsRealtime(this._pollTime);
+                if (this.State == SecurityCameraState.Offline)
+                {
+                    this.UpdateIndicator(this.OfflineColor);
+                    if (this.DebugEnabled)
+                        Debug.Log("Not ONLINE, So skipping the main camera loop");
+                    // Just wait for a second, and check again for scan/online.
+                    yield return new WaitForSecondsRealtime(1f);
+                    continue;
+                }
 
-                var player = GameObject.Find("Player");
-                RaycastHit hit;
-                var planes = GeometryUtility.CalculateFrustumPlanes(this._camera);
+                // OFF / Not looking for player
+                if (this.DebugEnabled)
+                    Debug.Log("Just turned the cam off");
+                if (this.DebugEnabled)
+                    Debug.Log("Poll Time: " + this.PollTime);
+                yield return new WaitForSecondsRealtime(this.PollTime / 2f);
 
-                if (GeometryUtility.TestPlanesAABB(planes, player.GetComponent<Collider>().bounds))
-                    this.PlayerDetected();
+                // ON / Looking for player
+                this.UpdateIndicator(this.OnlineColor);
+                if (this.DebugEnabled)
+                    Debug.Log("ONLINE");
+                var waitTime = 0f;
+                var pollCount = 0;
+                while (waitTime < this.PollTime/2f)
+                {
+                    var wait = 0.5f;
+                    yield return new WaitForSecondsRealtime(wait);
+                    waitTime += wait;
+                    pollCount++;
+                    this.UpdateIndicator(pollCount % 2 == 0 ? this.OfflineColor : this.OnlineColor);
+                    if (this.DebugEnabled)
+                        Debug.Log("Updated indicator");
+
+                    var player = GameObject.Find("Player");
+                    if (player.layer != 10)
+                        continue;
+
+                    var planes = GeometryUtility.CalculateFrustumPlanes(this._camera);
+
+                    if (!GeometryUtility.TestPlanesAABB(planes, player.GetComponent<Collider>().bounds))
+                        continue;
+
+                    RaycastHit hit;
+                    if (
+                        Physics.Raycast(
+                            new Ray(this.transform.position, player.transform.position - this.transform.position),
+                            this.CameraDistance, LayerMask.GetMask(new string[] {"Player"})))
+                    {
+                        this.PlayerDetected();
+                    }
+                }
             }
         }
 
@@ -91,10 +147,15 @@ namespace UltimateHacker
 
         private void UpdateIndicator()
         {
+            this.UpdateIndicator(this.ColorForStatus(this.State));
+        }
+
+        private void UpdateIndicator(Color c)
+        {
             if (this.Indicator == null)
                 return;
 
-            this.Indicator.GetComponent<MeshRenderer>().material.color = this.ColorForStatus(this.State);
+            this.Indicator.GetComponent<MeshRenderer>().material.color = c;
         }
 
         private Color ColorForStatus(SecurityCameraState s)
@@ -114,6 +175,14 @@ namespace UltimateHacker
 
         private void OnDrawGizmos()
         {
+            var playerPos = GameObject.Find("Player").transform.position;
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(this.transform.position, playerPos);
+
+            Gizmos.color = Color.red;
+            var direction = playerPos - this.transform.position;
+            Gizmos.DrawRay(this.transform.position, direction.normalized * this.CameraDistance);
+
             var oldMatrix = Gizmos.matrix;
             Gizmos.matrix = this.transform.localToWorldMatrix;
 
@@ -121,8 +190,6 @@ namespace UltimateHacker
             Gizmos.DrawFrustum(Vector3.zero, 40f, 60f, 0.1f, 1.4f);
 
             Gizmos.matrix = oldMatrix;
-            Gizmos.color = Color.blue;
-            Gizmos.DrawLine(this.transform.position, GameObject.Find("Player").transform.position);
         }
 
         public List<string> CommandStatusCheck()
@@ -221,7 +288,10 @@ namespace UltimateHacker
 
         public List<string> CommandSetPollingTime(float time)
         {
-            throw new System.NotImplementedException();
+            var output = new List<string>();
+            this.PollTime = time;
+            output.Add(string.Format("Polling time updated to <color=\"orange\">{0:0.##}s</color>", time));
+            return output;
         }
 
         public List<string> CommandRecord(float time)

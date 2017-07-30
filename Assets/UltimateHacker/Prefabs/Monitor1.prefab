@@ -143,6 +143,4 @@ MonoBehaviour:
   CursorBlinkRate: 1.2
   Cursor: _
   MaxTextLines: 20
-  LinkedDevices:
-  - {fileID: 0}
-  - {fileID: 0}
+  LinkedDevices: []

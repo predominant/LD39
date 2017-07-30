@@ -53,6 +53,12 @@ namespace UltimateHacker
             if (Input.GetKey(KeyCode.E))
                 if (this.ActionTarget != null)
                     this.ActionTarget.DoAction();
+
+            if (Input.GetKeyDown(KeyCode.RightBracket))
+                if (this.gameObject.layer == 10)
+                    this.gameObject.layer = 0;
+                else
+                    this.gameObject.layer = 10;
         }
 
         private void FixedUpdate()
