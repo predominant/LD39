@@ -17,6 +17,9 @@ namespace UltimateHacker
         private float _inputAngularForce = 0f;
         private float _vertAngularForce = 0f;
 
+        public bool HasRecording = false;
+        public float Recording = 0f;
+
         private Vector3 _oldMousePosition = Vector3.zero;
 
         public IActionTarget ActionTarget;

@@ -31,6 +31,7 @@ namespace UltimateHacker
         private SecurityCameraState _state = SecurityCameraState.Online;
         private float _recording = 0f;
         private float _pollTime = 0.5f;
+        private PlayerController _player;
 
         private float PollTime
         {
@@ -55,6 +56,7 @@ namespace UltimateHacker
 
         private void Awake()
         {
+            this._player = GameObject.Find("Player").GetComponent<PlayerController>();
             this._gameController = GameObject.Find("GameController").GetComponent<GameController>();
             this._camera = this.gameObject.AddComponent<Camera>();
             // Basically don't render this camera.
@@ -116,7 +118,7 @@ namespace UltimateHacker
                     if (this.DebugEnabled)
                         Debug.Log("Updated indicator");
 
-                    var player = GameObject.Find("Player");
+                    var player = this._player.gameObject;
                     if (player.layer != 10)
                         continue;
 
@@ -310,22 +312,80 @@ namespace UltimateHacker
 
         public List<string> CommandRecord(float time)
         {
-            throw new System.NotImplementedException();
+            this._recording = time;
+            return new List<string>()
+            {
+                "Recording ...",
+                string.Format("Recorded the last {0}s sensor data", time)
+            };
         }
 
         public List<string> CommandGetRecording()
         {
-            throw new System.NotImplementedException();
+            if (this._recording <= 1f)
+            {
+                return new List<string>()
+                {
+                    "<color=\"red\">ERR</color>: There is no recorded data on this device."
+                };
+            }
+
+            this._player.HasRecording = true;
+            this._player.Recording = this._recording;
+
+            return new List<string>()
+            {
+                "Downloading ...",
+                ". . . . . . . .",
+                string.Format(
+                    "Downloaded {0}s of sensor data from {1}",
+                    this._recording,
+                    this.gameObject.name)
+            };
         }
 
         public List<string> CommandPutRecording(float time)
         {
-            throw new System.NotImplementedException();
+            if (!this._player.HasRecording)
+            {
+                return new List<string>()
+                {
+                    "<color=\"red\">ERR</color>: No recording is available to upload."
+                };
+            }
+
+            if (this._recording > 1f)
+            {
+                return new List<string>()
+                {
+                    "<color=\"red\">ERR</color>: This devices buffer already contains a recording."
+                };
+            }
+
+            this._player.HasRecording = false;
+            this._recording = this._player.Recording;
+            this._player.Recording = 0f;
+
+            return new List<string>()
+            {
+                "Modifying identification information ...",
+                "Uploading ...",
+                ". . . . . . . .",
+                string.Format(
+                    "Uploaded {0}s of sensor data to {1}",
+                    this._recording,
+                    this.gameObject.name)
+            };
         }
 
         public List<string> CommandDeleteRecording()
         {
-            throw new System.NotImplementedException();
+            this._recording = 0f;
+            return new List<string>()
+                {
+                    "Deleting sensor buffer...",
+                    "All buffered sensor data has been deleted"
+                };
         }
     }
 }
