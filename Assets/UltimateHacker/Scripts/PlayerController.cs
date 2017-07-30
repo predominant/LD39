@@ -48,6 +48,12 @@ namespace UltimateHacker
             if (Input.GetKey(KeyCode.A))
                 this._inputForce -= this.transform.right * this.MoveSpeed;
 
+            if (Input.GetKey(KeyCode.Space))
+                this._inputForce += Vector3.up * this.MoveSpeed;
+
+            if (Input.GetKey(KeyCode.LeftControl))
+                this._inputForce -= Vector3.up * this.MoveSpeed;
+
             this._inputAngularForce = Input.GetAxis("Mouse X") * this.TurnSpeed;
 
             if (Input.GetKey(KeyCode.E))
