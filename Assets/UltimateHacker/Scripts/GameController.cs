@@ -14,6 +14,7 @@ namespace UltimateHacker
         public GameObject TerminalUI;
         public GameObject LevelCompleteUI;
         public GameObject PlayerDetectedUI;
+        public GameObject QuitUI;
         public Camera MainCamera;
 
         public string MainMenuScene;
@@ -38,11 +39,14 @@ namespace UltimateHacker
 
         private IEnumerator LookAt(Vector3 pos)
         {
-            var direction = this.PlayerController.transform.position - this.transform.position;
+            var direction = pos - this.PlayerController.transform.position;
             while (true)
             {
                 var toRotation = Quaternion.FromToRotation(this.transform.forward, direction);
-                Quaternion.Slerp(this.MainCamera.transform.rotation, toRotation, Time.deltaTime);
+                this.MainCamera.transform.rotation = Quaternion.Lerp(
+                    this.MainCamera.transform.rotation,
+                    toRotation,
+                    Time.deltaTime);
                 yield return new WaitForEndOfFrame();
             }
         }

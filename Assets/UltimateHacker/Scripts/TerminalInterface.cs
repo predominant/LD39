@@ -13,6 +13,8 @@ namespace UltimateHacker
         public bool CanSetPollingTime;
         public bool CanRecord;
         public bool CanPlayback;
+        public bool CanGetRecording;
+        public bool CanPutRecording;
 
         public bool HasMonitor;
 
@@ -45,8 +47,12 @@ namespace UltimateHacker
             if (this.CanRecord)
                 output.Add("  record             - Record sensor data from the device (10s)");
             if (this.CanPlayback)
-                output.Add("  playback <file>    - Playback sensor data to the device");
-
+                output.Add("  playback           - Playback sensor data to the device");
+            if (this.CanGetRecording)
+                output.Add("  getrecording       - Download sensor data from device");
+            if (this.CanPutRecording)
+                output.Add("  putrecording       - Upload sensor data recording to device");
+                output.Add("                       Must have a recording resident in drone");
             return output;
         }
     }

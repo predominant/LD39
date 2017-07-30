@@ -10,10 +10,12 @@ namespace UltimateHacker
 
         public float MoveSpeed = 2f;
         public float TurnSpeed = 2f;
+        public Rigidbody CameraRigidbody;
 
         private Rigidbody _rigidbody;
         private Vector3 _inputForce = Vector3.zero;
         private float _inputAngularForce = 0f;
+        private float _vertAngularForce = 0f;
 
         private Vector3 _oldMousePosition = Vector3.zero;
 
@@ -55,10 +57,17 @@ namespace UltimateHacker
                 this._inputForce -= Vector3.up * this.MoveSpeed;
 
             this._inputAngularForce = Input.GetAxis("Mouse X") * this.TurnSpeed;
+            this._vertAngularForce = Input.GetAxis("Mouse Y") * this.TurnSpeed;
 
             if (Input.GetKey(KeyCode.E))
                 if (this.ActionTarget != null)
                     this.ActionTarget.DoAction();
+
+            if (Input.GetKeyUp(KeyCode.Escape))
+            {
+                var gc = GameObject.Find("GameController").GetComponent<GameController>();
+                gc.QuitUI.SetActive(!gc.QuitUI.activeSelf);
+            }
 
             if (Input.GetKeyDown(KeyCode.RightBracket))
                 if (this.gameObject.layer == 10)
@@ -74,6 +83,8 @@ namespace UltimateHacker
 
             this._rigidbody.AddForce(this._inputForce);
             this._rigidbody.AddTorque(this.transform.up * this._inputAngularForce);
+
+            //this.CameraRigidbody.AddRelativeTorque(this.transform.right * this._vertAngularForce);
         }
     }
 }

@@ -225,7 +225,11 @@ namespace UltimateHacker
                 case "poweroff":
                     return this.CommandPoweroff();
                 case "polltime":
-                    if (command.Length == 2)
+                    if (command.Length == 1)
+                    {
+                        return this.CommandGetPollingTime();
+                    }
+                    else if (command.Length == 2)
                     {
                         var time = 1f;
                         float.TryParse(command[1], out time);
@@ -282,7 +286,17 @@ namespace UltimateHacker
             var output = new List<string>();
             output.Add("Restarting device, all current data will be lost...");
             this.State = SecurityCameraState.Online;
+            this.PollTime = 0.5f;
             this._recording = 0f;
+            return output;
+        }
+
+        public List<string> CommandGetPollingTime()
+        {
+            var output = new List<string>();
+            output.Add(string.Format(
+                "Current polling time is <color=\"orange\">{0:0.##}s</color>",
+                this.PollTime));
             return output;
         }
 

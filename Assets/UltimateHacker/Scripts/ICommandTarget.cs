@@ -11,5 +11,6 @@ namespace UltimateHacker
         List<string> CommandPoweroff();
         List<string> CommandRestart();
         List<string> CommandSetPollingTime(float time);
+        List<string> CommandGetPollingTime();
     }
 }

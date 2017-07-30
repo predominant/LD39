@@ -163,5 +163,10 @@ namespace UltimateHacker
         {
             throw new System.NotImplementedException();
         }
+
+        public List<string> CommandGetPollingTime()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
