@@ -93,7 +93,7 @@ namespace UltimateHacker
             if (!this.Online)
                 return;
 
-            this._gameController.PlayerDetected();
+            this._gameController.PlayerDetected(this.gameObject);
         }
 
         public List<string> CommandStatusCheck()
@@ -105,9 +105,31 @@ namespace UltimateHacker
             };
         }
 
-        public List<string> ProcessCommand(string command)
+        public List<string> ProcessCommand(string commandStr)
         {
-            throw new System.NotImplementedException();
+            // TerminalInterface defines dynamic capabilities
+            var termInterface = this.GetComponent<TerminalInterface>();
+            var command = commandStr.Split(' ');
+
+            switch (command[0])
+            {
+                case "status":
+                    return this.CommandStatusCheck();
+                case "poweroff":
+                    return this.CommandPoweroff();
+                //case "polltime":
+                //    if (command.Length == 2)
+                //    {
+                //        var time = 1f;
+                //        float.TryParse(command[1], out time);
+                //        return this.CommandSetPollingTime(time);
+                //    }
+                //    return new List<string>() {
+                //        "<color=\"red\">ERR</color>: Invalid command format. Use: polltime <seconds>"
+                //    };
+                default:
+                    return this.CommandNotFound(command[0]);
+            }
         }
 
         public List<string> CommandNotFound(string command)
@@ -117,7 +139,19 @@ namespace UltimateHacker
 
         public List<string> CommandPoweroff()
         {
-            throw new System.NotImplementedException();
+            var output = new List<string>();
+
+            if (this.Online)
+            {
+                output.Add("Laser Barrier is powering down...");
+                output.Add("Laser Barrier is disabled.");
+                this.Online = false;
+            }
+            else
+            {
+                output.Add("Laser Barrier is already disabled");
+            }
+            return output;
         }
 
         public List<string> CommandRestart()

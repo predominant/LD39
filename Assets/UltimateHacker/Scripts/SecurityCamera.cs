@@ -86,7 +86,7 @@ namespace UltimateHacker
             if (this.State != SecurityCameraState.Online)
                 return;
 
-            //this._gameController.
+            this._gameController.PlayerDetected(this.gameObject);
         }
 
         private void UpdateIndicator()

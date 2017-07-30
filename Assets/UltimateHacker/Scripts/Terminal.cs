@@ -190,9 +190,10 @@ namespace UltimateHacker
                     break;
                 default:
                     //if (!this._currentContext.GetComponent<ICommandTarget>())
-                    var x = this._currentContext.GetComponent<ICommandTarget>();
+
                     try
                     {
+                        var x = this._currentContext.GetComponent<ICommandTarget>();
                         output = x.ProcessCommand(command);
                     }
                     catch (Exception)
