@@ -5,7 +5,10 @@ namespace UltimateHacker
 {
     public class TerminalInterface : MonoBehaviour
     {
-        public bool CanShutdown;
+        public ICommandTarget CommandTarget;
+
+        public bool CanStatusCheck;
+        public bool CanPoweroff;
         public bool CanRestart;
         public bool CanSetPollingTime;
         public bool CanRecord;
@@ -35,8 +38,8 @@ namespace UltimateHacker
 
             if (this.CanRestart)
                 output.Add("  restart            - Restart the device");
-            if (this.CanShutdown)
-                output.Add("  shutdown           - Shutdown the device");
+            if (this.CanPoweroff)
+                output.Add("  poweroff           - Shutdown the device");
             if (this.CanSetPollingTime)
                 output.Add("  polltime <seconds> - Set the device polling time");
             if (this.CanRecord)
