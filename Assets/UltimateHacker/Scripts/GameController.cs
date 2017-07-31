@@ -68,6 +68,7 @@ namespace UltimateHacker
             this.PlayerController.ControlEnabled = false;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            this.LevelCompleteUI.SetActive(true);
         }
 
         public void NextLevel()
